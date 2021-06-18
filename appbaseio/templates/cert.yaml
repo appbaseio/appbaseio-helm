@@ -7,6 +7,4 @@ type: Opaque
 data:
   tls.crt: {{ .Values.cert.tlsCrt }}
   tls.key: {{ .Values.cert.tlsKey }}
-  ca.crt: {{ .Values.cert.caCrt }}
-
 {{ end }}

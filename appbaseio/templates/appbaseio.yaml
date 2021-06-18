@@ -28,7 +28,7 @@ spec:
             - name: APPBASE_ID
               value: {{ .Values.appbase.id }}
             - name: ES_CLUSTER_URL
-              value: {{ .Values.elasticsearch.clusterURL }}
+              value: {{ .Values.elasticsearch.scheme }}://{{ .Values.elasticsearch.username }}:{{ .Values.elasticsearch.password }}@{{ .Values.elasticsearch.host}}:{{ .Values.elasticsearch.port }}
             - name: LOG_FILE_PATH
               value: "/var/log/es.json"
           image: {{.Values.appbase.image}}:{{.Values.appbase.tag | default .Chart.AppVersion}}

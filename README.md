@@ -23,7 +23,8 @@ Here we get benefit of Helm Charts to package Arc (which is an API Gateway that 
 1- run `helm repo add appbase https://opensource.appbase.io/helm-charts/`
 
 2- run `helm repo update`
-2- run `helm install appbaseio appbase/appbaseio  --set <variables>`
+
+3- run `helm install appbaseio appbase/appbaseio  --set <variables>`
 
 Make sure that you set below variables which are mandatory:
 
@@ -42,7 +43,11 @@ We categorized variables in order to ease it's readability, for example `elastic
 Here are the variables you can set for your cluster:
 |  Name |Default Value   | Kind  |  Description |
 |---|---|---|---|
-| elasticsearch.clusterURL  | ""  | String  |  clusterURL based on basic authentication. fluent-bit splites this clusterURL soit should be in following pattern: "http://<user>:<password>@domain:port" ( Prtotocol Can also be -> https)  |
+| elasticsearch.scheme  | "http"  | String  |  If you set this variable to `https` it tries to create a secure connection but you should have configured your SSL certificate  |
+| elasticsearch.port  | 9200  | Integer  |  This is the port of your elasticsearch cluster, if you already configured SSL certificate and set scheme as `https` you should set this variable with `443` |
+| elasticsearch.username  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication on your elasticsearch cluster |
+| elasticsearch.password  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication on your elasticsearch cluster |
+| elasticsearch.host  | "0.0.0.0"  | String  |  This is your elasticsearch domain/IP which shouldn't be filled with any kind of prefixes, also if your elasticsearch is in your kubernetes cluster, you can use it's Service name here|
 |  appbase.name | arc  |  String | It's the name of Arc service (appbase API gate way for elasticsearch) which you can use to access your application via service name, there will be a kubernetes service with this name in default namespace  |
 |  appbase.image |  appbaseio/arc | String  |  This is the image Appbase.io provides as gateway for your elasticsearch, if you have your local repository, you can push Arc image into that then change the URL here. |
 |  appbase.tag |  "" | String  | This is Arc Image tag which is currently set to a stable tag but if you want to use a specific image, can mention by setting this variable |
@@ -57,8 +62,8 @@ Here are the variables you can set for your cluster:
 |  volume.storageSize | 1Gi  | String  | This is the size of PVC storage, Default volume size is 5Gi which you can handle how much of it be assigned to PVC  |
 |  volume.pvcName | pvc  | String  |  You can change PVC (Persitent Volume Claim) name here, it's assigned to PV(Persistent Volume), if you have a seperated PV, you can set PVC name in [`claimRef`]("https://kubernetes.io/docs/concepts/storage/persistent-volumes/#reserving-a-persistentvolume") |
 |  cert.name | ""  | String  | you can add your certificate here by configuring below values. name is the name of secret file containing your certificate information, if you have your own secret file, you can only fill the name value and leave the other empty  |
-| cert.tlsCrt  |  "" | String  |  "tlsCrt" is your "tls.crt" |
-|  cert.tlsKey | ""  | String  | "tlsKey" is "tls.key"  |
+| cert.tlsCrt  |  "" | String  |  "tlsCrt" is your "tls.crt". it can be passed as base64 encoded|
+|  cert.tlsKey | ""  | String  | "tlsKey" is "tls.key". it can be passed as base64 encoded  |
 | loadBalancer.serviceType  | ""  | String  |If yo're using kubernetes locally and as you won't have external IP, Can be "NodePort" but if it's your production kubernetes, you can leave it empty which means serviceType is : "LoadBalancer"|
 
 **Tips:**

@@ -43,7 +43,7 @@ We categorized variables in order to ease it's readability, for example `elastic
 Here are the variables you can set for your cluster:
 |  Name |Default Value   | Kind  |  Description |
 |---|---|---|---|
-| elasticsearch.scheme  | "http"  | String  |  If you set this variable to `https` it tries to create a secure connection but you should have configured your SSL certificate  |
+| elasticsearch.scheme  | ""  | String  |  If you set this variable to `https` it tries to create a secure connection to your elasticsearch cluster but you should have configured your SSL certificate, if you are using default host and port, just leave it empty otherwise your elasticsearch port will be changed - supports: `http` or `https` and if not set, elasticsearch port will be `9200` |
 | elasticsearch.port  | 9200  | Integer  |  This is the port of your elasticsearch cluster, if you already configured SSL certificate and set scheme as `https` you should set this variable with `443` |
 | elasticsearch.username  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication on your elasticsearch cluster |
 | elasticsearch.password  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication on your elasticsearch cluster |

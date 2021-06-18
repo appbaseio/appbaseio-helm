@@ -50,20 +50,22 @@ data:
       Name        es
       Match       *
       Host        {{ .Values.elasticsearch.host }}
-      {{ if eq .Values.elasticsearch.scheme "http"}}
-      Port        {{ .Values.elasticsearch.port }}
-      {{ else if eq .Values.elasticsearch.scheme "https" }}
-      Port        443
+      {{- if eq .Values.elasticsearch.scheme "http"}}
+      Port        {{ .Values.elasticsearch.port | default 80}}
+      {{- else if eq .Values.elasticsearch.scheme "https" }}
+      Port        {{ .Values.elasticsearch.port | default 443}}
+      {{- else }}
+      Port        {{ .Values.elasticsearch.port | default 9200}}
+      {{- end }}
       Index       .logs
       Type        _doc
       Generate_ID true
       {{if eq .Values.elasticsearch.scheme "https" }}
-      tls         on
-      tls.verify  on
+      tls         On
       {{else if eq .Values.elasticsearch.scheme "http" }}
       tls         Off
-      tls.verify  Off
       {{ end }}
+      tls.verify  Off
       HTTP_User    {{ .Values.elasticsearch.username }}
       HTTP_Passwd {{ .Values.elasticsearch.password }}
   parsers.conf: |
@@ -108,7 +110,13 @@ spec:
             - name: ELASTICSEARCH_HOST
               value: {{ .Values.elasticsearch.host }}
             - name: ELASTICSEARCH_PORT
-              value: {{ .Values.elasticsearch.port }}
+            {{- if eq .Values.elasticsearch.scheme "http"}}
+              value: "{{ .Values.elasticsearch.port | default 80}}"
+              {{- else if eq .Values.elasticsearch.scheme "https"}}
+              value: "{{ .Values.elasticsearch.port | default 443}}"
+              {{- else }}
+              value: "{{ .Values.elasticsearch.port | default 9200}}"
+              {{- end }}
             - name: ELASTICSEARCH_USERNAME
               value: {{ .Values.elasticsearch.username }}
             - name: ELASTICSEARCH_PASSWORD

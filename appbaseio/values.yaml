@@ -3,8 +3,8 @@
 # change clusterDomain if you have another domain for your elasticsearch or change it if your elasticsearch kubernetes service name is different
 elasticsearch:
   # make sure that you have configured your SSL certificate if you're using HTTPS scheme
-  scheme: 'http'
-  port: 9200
+  scheme: ''
+  port: ''
   username: ''
   password: ''
   host: '0.0.0.0'

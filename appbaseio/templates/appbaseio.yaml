@@ -21,6 +21,12 @@ spec:
     spec:
       containers:
         - env:
+        {{- $equ := ""}}
+        {{- $at := ""}}
+        {{- if and .Values.elasticsearch.username .Values.elasticsearch.password}}
+        {{- $equ = ":"}}
+        {{- $at = "@"}}
+        {{- end }}
             - name: USERNAME
               value: {{ .Values.appbase.username }}
             - name: PASSWORD
@@ -28,7 +34,17 @@ spec:
             - name: APPBASE_ID
               value: {{ .Values.appbase.id }}
             - name: ES_CLUSTER_URL
-              value: {{ .Values.elasticsearch.clusterURL }}
+            {{- if and (eq .Values.elasticsearch.scheme "http") (empty .Values.elasticsearch.port)}}
+              value: {{ .Values.elasticsearch.scheme }}://{{ .Values.elasticsearch.username }}{{ $equ }}{{ .Values.elasticsearch.password }}{{$at}}{{ .Values.elasticsearch.host}}:80
+              {{- else if and (eq .Values.elasticsearch.scheme "https") (empty .Values.elasticsearch.port)}}
+              value: {{ .Values.elasticsearch.scheme }}://{{ .Values.elasticsearch.username }}{{ $equ }}{{ .Values.elasticsearch.password }}{{$at}}{{ .Values.elasticsearch.host}}:443
+              {{- else if and (empty .Values.elasticsearch.schem) (.Values.elasticsearch.port)}}
+              value: {{ .Values.elasticsearch.scheme | default "http"}}://{{ .Values.elasticsearch.username }}{{ $equ }}{{ .Values.elasticsearch.password }}{{$at}}{{ .Values.elasticsearch.host}}:{{ .Values.elasticsearch.port}}
+              {{- else if and (.Values.elasticsearch.schem) (.Values.elasticsearch.port)}}
+              value: {{ .Values.elasticsearch.scheme | default "http"}}://{{ .Values.elasticsearch.username }}{{ $equ }}{{ .Values.elasticsearch.password }}{{$at}}{{ .Values.elasticsearch.host}}:{{ .Values.elasticsearch.port}}
+              {{- else }}
+              value: {{ .Values.elasticsearch.scheme | default "http"}}://{{ .Values.elasticsearch.username }}{{ $equ }}{{ .Values.elasticsearch.password }}{{$at}}{{ .Values.elasticsearch.host}}:{{ .Values.elasticsearch.port | default 9200}}
+              {{- end }}
             - name: LOG_FILE_PATH
               value: "/var/log/es.json"
           image: {{.Values.appbase.image}}:{{.Values.appbase.tag | default .Chart.AppVersion}}

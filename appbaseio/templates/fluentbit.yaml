@@ -14,15 +14,6 @@ rules:
       - pods
     verbs: ["get", "list", "watch"]
 
-{{ $a := split "//" .Values.elasticsearch.clusterURL}}
-{{ $b := split ":" $a._1 }}
-{{ $user := $b._0 }}
-{{ $c := split "@" $b._1}}
-{{ $pass := $c._0}}
-{{ $domain := $c._1 }}
-{{ $port := "443" }}
-{{ $port = $b._2 }}
-
 ---
 
 apiVersion: v1
@@ -58,15 +49,25 @@ data:
     [OUTPUT]
       Name        es
       Match       *
-      Host        "{{ $domain }}"
-      Port        "{{ $port }}"
+      Host        {{ .Values.elasticsearch.host }}
+      {{- if eq .Values.elasticsearch.scheme "http"}}
+      Port        {{ .Values.elasticsearch.port | default 80}}
+      {{- else if eq .Values.elasticsearch.scheme "https" }}
+      Port        {{ .Values.elasticsearch.port | default 443}}
+      {{- else }}
+      Port        {{ .Values.elasticsearch.port | default 9200}}
+      {{- end }}
       Index       .logs
       Type        _doc
       Generate_ID true
+      {{if eq .Values.elasticsearch.scheme "https" }}
+      tls         On
+      {{else if eq .Values.elasticsearch.scheme "http" }}
       tls         Off
+      {{ end }}
       tls.verify  Off
-      HTTP_User    "{{ $user }}"
-      HTTP_Passwd "{{ $pass }}"
+      HTTP_User    {{ .Values.elasticsearch.username }}
+      HTTP_Passwd {{ .Values.elasticsearch.password }}
   parsers.conf: |
     [PARSER]
       Name        docker
@@ -107,13 +108,19 @@ spec:
             - containerPort: 2020
           env:
             - name: ELASTICSEARCH_HOST
-              value: "{{ $domain }}"
+              value: {{ .Values.elasticsearch.host }}
             - name: ELASTICSEARCH_PORT
-              value: "{{ $port }}"
+            {{- if eq .Values.elasticsearch.scheme "http"}}
+              value: "{{ .Values.elasticsearch.port | default 80}}"
+              {{- else if eq .Values.elasticsearch.scheme "https"}}
+              value: "{{ .Values.elasticsearch.port | default 443}}"
+              {{- else }}
+              value: "{{ .Values.elasticsearch.port | default 9200}}"
+              {{- end }}
             - name: ELASTICSEARCH_USERNAME
-              value: "{{ $user }}"
+              value: {{ .Values.elasticsearch.username }}
             - name: ELASTICSEARCH_PASSWORD
-              value: "{{ $pass }}"
+              value: {{ .Values.elasticsearch.password }}
           volumeMounts:
             - name: varlog
               mountPath: /var/log

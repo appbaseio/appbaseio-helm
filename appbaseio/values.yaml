@@ -2,9 +2,12 @@
 # change defUsername if you have another usename defined for you elasticsearch
 # change clusterDomain if you have another domain for your elasticsearch or change it if your elasticsearch kubernetes service name is different
 elasticsearch:
-  # clusterURL based on basic authentication / fluent-bit splites this clusterURL so
-  # it should be in following pattern: http://<user>:<password>@domain:port ( Prtotocol Can also be -> https)
-  clusterURL: ''
+  # make sure that you have configured your SSL certificate if you're using HTTPS scheme
+  scheme: ''
+  port: ''
+  username: ''
+  password: ''
+  host: '0.0.0.0'
 
 # Appbase.io configuration / get id from "https://arc-dashboard.appbase.io/install"
 appbase:

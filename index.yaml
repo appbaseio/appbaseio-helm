@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  appbaseio:
+  - apiVersion: v2
+    appVersion: 7.45.0-beta
+    created: "2021-06-21T10:38:07.979260031+04:30"
+    description: A Helm chart for Kubernetes
+    digest: 9de67ce8ab15be29224fe665709d027dbedd76c457cb8104420f8b8758518c1b
+    name: appbaseio
+    type: application
+    urls:
+    - https://opensource.appbase.io/helm-charts/appbaseio-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-06-21T10:38:07.978602174+04:30"

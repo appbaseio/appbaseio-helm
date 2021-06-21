@@ -1,0 +1,43 @@
+# ElasticSearch Configuration
+# change defUsername if you have another usename defined for you elasticsearch
+# change clusterDomain if you have another domain for your elasticsearch or change it if your elasticsearch kubernetes service name is different
+elasticsearch:
+  # make sure that you have configured your SSL certificate if you're using HTTPS scheme
+  scheme: ''
+  port: ''
+  username: ''
+  password: ''
+  host: '0.0.0.0'
+
+# Appbase.io configuration / get id from "https://arc-dashboard.appbase.io/install"
+appbase:
+  #APPBASE_ID
+  id: ''
+  #APPBASE_USERNAME
+  username: 'admin'
+  #APPBASE_PASSWORD
+  password: 'admin'
+  domain: ''
+  # name for appbase service
+  name: 'appbase'
+  nodes: 1
+  # image address
+  image: 'appbaseio/arc'
+  tag: ''
+  # appbase service port
+  port: 8000
+  storage: 1Gi
+
+# you can add your certificate here by configuring below values
+# tlsCrt is your tls.crt / tlsKey is tls.key / caCrt is ca.crt
+# name is the name of secret file containing your certificate information, if you have your own secret file, you can only fill the name value and leave the other empty
+cert:
+  name: ''
+  tlsCrt: ''
+  tlsKey: ''
+  caCrt: ''
+
+# Nginx LoadBalancer Config
+
+loadBalancer:
+  serviceType: ''

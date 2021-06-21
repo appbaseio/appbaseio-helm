@@ -1,0 +1,165 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-read
+rules:
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - pods
+    verbs: ["get", "list", "watch"]
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  labels:
+    k8s-app: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+      Flush        1
+      Daemon       off
+      Log_Level    trace
+      Parsers_File parsers.conf
+    [INPUT]
+      Name              tail
+      Path              /var/log/es.json
+      Buffer_Chunk_Size 3MB
+      Buffer_Max_Size   487MB
+    [FILTER]
+      Name         parser
+      Parser       docker
+      Match        *
+      Key_Name     log
+      Reserve_Data true
+    [FILTER]
+      Name     throttle
+      Match    *
+      Rate     15
+      Window   10
+      Interval 15s
+    [OUTPUT]
+      Name        es
+      Match       *
+      Host        {{ .Values.elasticsearch.host }}
+      {{- if eq .Values.elasticsearch.scheme "http"}}
+      Port        {{ .Values.elasticsearch.port | default 80}}
+      {{- else if eq .Values.elasticsearch.scheme "https" }}
+      Port        {{ .Values.elasticsearch.port | default 443}}
+      {{- else }}
+      Port        {{ .Values.elasticsearch.port | default 9200}}
+      {{- end }}
+      Index       .logs
+      Type        _doc
+      Generate_ID true
+      {{if eq .Values.elasticsearch.scheme "https" }}
+      tls         On
+      {{else if eq .Values.elasticsearch.scheme "http" }}
+      tls         Off
+      {{ end }}
+      tls.verify  Off
+      HTTP_User    {{ .Values.elasticsearch.username }}
+      HTTP_Passwd {{ .Values.elasticsearch.password }}
+  parsers.conf: |
+    [PARSER]
+      Name        docker
+      Format      json
+      Time_Key    timestamp
+      Time_Format %Y-%m-%dT%H:%M:%S.%LZ
+      Time_Keep   On
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  labels:
+    k8s-app: fluent-bit-logging
+    version: v1
+    kubernetes.io/cluster-service: "true"
+spec:
+  selector:
+    matchLabels:
+      k8s-app: fluent-bit-logging
+  template:
+    metadata:
+      labels:
+        k8s-app: fluent-bit-logging
+        version: v1
+        kubernetes.io/cluster-service: "true"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2020"
+        prometheus.io/path: /api/v1/metrics/prometheus
+    spec:
+      containers:
+        - name: fluent-bit
+          image: fluent/fluent-bit:1.5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2020
+          env:
+            - name: ELASTICSEARCH_HOST
+              value: {{ .Values.elasticsearch.host }}
+            - name: ELASTICSEARCH_PORT
+            {{- if eq .Values.elasticsearch.scheme "http"}}
+              value: "{{ .Values.elasticsearch.port | default 80}}"
+              {{- else if eq .Values.elasticsearch.scheme "https"}}
+              value: "{{ .Values.elasticsearch.port | default 443}}"
+              {{- else }}
+              value: "{{ .Values.elasticsearch.port | default 9200}}"
+              {{- end }}
+            - name: ELASTICSEARCH_USERNAME
+              value: {{ .Values.elasticsearch.username }}
+            - name: ELASTICSEARCH_PASSWORD
+              value: {{ .Values.elasticsearch.password }}
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+              subPath: es.json
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: fluent-bit-config
+              mountPath: /fluent-bit/etc/
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: fluent-bit-config
+          configMap:
+            name: fluent-bit-config
+      serviceAccountName: fluent-bit
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - operator: "Exists"
+          effect: "NoExecute"
+        - operator: "Exists"
+          effect: "NoSchedule"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit-read
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit-read
+subjects:
+  - kind: ServiceAccount
+    name: fluent-bit
+    namespace: default

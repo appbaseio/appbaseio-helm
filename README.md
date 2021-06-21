@@ -42,28 +42,23 @@ We categorized variables in order to ease it's readability, for example `elastic
 Here are the variables you can set for your cluster:
 |  Name |Default Value   | Kind  |  Description |
 |---|---|---|---|
-| elasticsearch.scheme  | ""  | String  |  If you set this variable to `https` it tries to create a secure connection to your elasticsearch cluster but you should have configured your SSL certificate, if you are using default host and port, just leave it empty otherwise your elasticsearch port will be changed - supports: `http` or `https` and if not set, elasticsearch port will be `9200` |
-| elasticsearch.port  | 9200  | Integer  |  This is the port of your elasticsearch cluster, if you already configured SSL certificate and set scheme as `https` you should set this variable with `443` |
+| elasticsearch.scheme  | "http"  | String  |  Supports: `http` (default) or `https` as valid values. If you set this variable to `https`, it tries to create a secure connection to your elasticsearch cluster but you should have configured your TLS certificate. |
+| elasticsearch.port  | 9200  | Integer  |  This is the port of your elasticsearch cluster, if you already configured TLS certificate and set scheme as `https`, you should set this to use `443` |
 | elasticsearch.username  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication setup on your elasticsearch cluster |
 | elasticsearch.password  | ""  | String  |  This is your elasticsearch cluster's username, this variable is mandatory if you have authentication setup on your elasticsearch cluster |
 | elasticsearch.host  | "0.0.0.0"  | String  |  This is your elasticsearch domain/IP which shouldn't be filled with any kind of prefixes, also if your elasticsearch is in your kubernetes cluster, you can use its service name here|
 |  appbase.name | arc  |  String | This is the name of the Arc service (appbase.io API gateway for elasticsearch) which you can use to access your application via service name, there will be a kubernetes service with this name in default namespace  |
-|  appbase.image |  appbaseio/arc | String  |  This is the image Appbase.io provides as gateway for your elasticsearch, if you have your local repository, you can push Arc image into that then change the URL here. |
-|  appbase.tag |  "" | String  | This is Arc image tag which is currently set to a stable tag but if you want to use a specific image, can mention by setting this variable |
-|  appbase.port | 8000  | Integer  | The port that used for Arc service |
+| appbase.image |  appbaseio/arc | String  |  This is the image Appbase.io provides as gateway for your elasticsearch, if you have your local repository, you can push Arc image into that then change the URL here. |
+| appbase.tag |  "" | String  | This is Arc image tag which is currently set to a stable tag but if you want to use a specific image, can mention by setting this variable |
+| appbase.port | 8000  | Integer  | The port that used for Arc service |
 | appbase.id  |  "" |  String |  This is **APPBASE_ID** that you can get from [Appbase.io]("https://arc-dashboard.appbase.io/install") |
-|  appbase.username | admin  |  String |  This is the username you choose for your Appbaseio |
+| appbase.username | admin  |  String |  This is the username you choose for your Appbaseio |
 | appbase.password  | admin  |  String | This is the password you choose for your Appbaseio  |
-|  appbase.domain |  "" |  String |  If you are installing helm chart on your production and want to assigne a domain to it, set this variable to your domain, make sure that your loadBalancer.serviceType to be empty ("") |
-|  volume.name | pv  | String  |  If you want  to use default volume, leave name empty but if you want to use your Persistent volume, enter it's name, the PVC ( persistent volume claim) will be assigned to it |
-|  volume.storageClassName |  standard | String  | Your Storage class which should be the same with PVC, if you have a specific class for your Volume, set that here to also be set for PVC  |
-| volume.accessModes  | ReadWriteMany  |  String |  Access mode for volume |
-|  volume.storageSize | 1Gi  | String  | This is the size of PVC storage, Default volume size is 5Gi which you can handle how much of it be assigned to PVC  |
-|  volume.pvcName | pvc  | String  |  You can change PVC (Persitent Volume Claim) name here, it's assigned to PV(Persistent Volume), if you have a seperated PV, you can set PVC name in [`claimRef`]("https://kubernetes.io/docs/concepts/storage/persistent-volumes/#reserving-a-persistentvolume") |
-|  cert.name | ""  | String  | you can add your certificate here by configuring below values. name is the name of secret file containing your certificate information, if you have your own secret file, you can only fill the name value and leave the other empty  |
-| cert.tlsCrt  |  "" | String  |  "tlsCrt" is your "tls.crt". it can be passed as base64 encoded|
-|  cert.tlsKey | ""  | String  | "tlsKey" is "tls.key". it can be passed as base64 encoded  |
-| loadBalancer.serviceType  | ""  | String  |If yo're using kubernetes locally and as you won't have external IP, Can be "NodePort" but if it's your production kubernetes, you can leave it empty which means serviceType is : "LoadBalancer"|
+| appbase.domain |  "" |  String |  If you are installing helm chart on your production and want to assigne a domain to it, set this variable to your domain, make sure that your loadBalancer.serviceType to be empty ("") |
+| cert.name | ""  | String  | You can add your certificate here by configuring below values. name is the name of secret file containing your certificate information, if you have your own secret file, you can only fill the name value and leave the other empty  |
+| cert.tlsCrt  |  "" | String  | "tlsCrt" is your "tls.crt". It should be passed as a base64 encoded |
+| cert.tlsKey | ""  | String  | "tlsKey" is "tls.key". It should be passed as a base64 encoded  |
+| loadBalancer.serviceType  | ""  | String  | If you're using Kubernetes locally and as you won't have external IP, Can be "NodePort" but if it's your production kubernetes, you can leave it empty which means serviceType is : "LoadBalancer" |
 
 **Tips:**
 
@@ -90,7 +85,7 @@ You can check [this page]("https://helm.sh/docs/topics/kubernetes_distros/") to 
 
 Which you can use the command to get access to your Appbaseio service
 
-    If you changr arc.name, the command will be: minikube service --url <arc name>-nodeport
+    If you change arc.name, the command will be: minikube service --url <arc name>-nodeport
 
 ## How to use it by cloning the project
 
@@ -114,7 +109,7 @@ These are required values you must fill:
 - **APPBASE_USERNAME**: This will be used while using appbaseio so you can choose your desired username by filling the variable
 - **APPBASE_PASSWORD**: This will be used while using appbaseio so you can choose your desired password by filling the variable
 
-you can leave other settings as their default value but if you want more setting like use your own volume as storage, use SSL certificate for your Appbase cluster and so on, modify the related part.
+you can leave other settings as their default value but if you want to specify other settings like using TLS certificate for your Appbase cluster and so on, modify the related part.
 
 **Note:**
 - handle arc version in Chart.yaml as **appVersion**

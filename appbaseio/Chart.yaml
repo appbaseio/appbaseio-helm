@@ -1,6 +1,6 @@
 apiVersion: v2
 name: appbaseio
-description: A Helm chart for Kubernetes
+description: appbase.io API gateway for an upstream Elasticsearch cluster
 
 type: application
 # This is the chart version. This version number should be incremented each time you make changes

@@ -22,7 +22,7 @@ appbase:
   name: 'appbase'
   nodes: 1
   # image address
-  image: 'appbaseio/arc'
+  image: 'appbaseio/reactivesearch-api'
   tag: ''
   # appbase service port
   port: 8000

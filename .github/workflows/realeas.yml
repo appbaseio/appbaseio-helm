@@ -25,10 +25,16 @@ jobs:
         with:
           version: v3.4.0
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.2.1
-        with:
-          charts_dir: charts
-          charts_repo_url: http://opensource.appbase.io/helm-charts/
-        env:
-          CR_TOKEN: "${{ secrets.RELEASER }}"
+      - name: test location
+        run: echo $(pwd)   
+
+      - name: check helm
+        run: helm version   
+
+      # - name: Run chart-releaser
+      #   uses: helm/chart-releaser-action@v1.2.1
+      #   with:
+      #     charts_dir: charts
+      #     charts_repo_url: http://opensource.appbase.io/helm-charts/
+      #   env:
+      #     CR_TOKEN: "${{ secrets.RELEASER }}"

@@ -1,4 +1,5 @@
-name: Release Charts
+# should have "zip" - "git" - "github runner" to be available on server ( in self-hosted mode )
+name: Helm Chart Releaser
 
 on:
   push:

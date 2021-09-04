@@ -31,6 +31,22 @@ jobs:
       - name: check helm
         run: helm version   
 
+      - name: Extract chartVersion
+        run: echo ::set-output name=chartVersion::grep 'version:' ./appbaseio/Chart.yaml | awk '{print $2}'
+        id: chartID
+
+      - name: Extracting AppVersion
+        run: echo ::set-output name=AppVersion::$(grep -A3 appVersion ./appbaseio/Chart.yaml | awk '{print $2}')   
+        id: appV
+
+      - name: Packaging
+        run: helm package ./appbaseio --app-version ${{steps.appV.output.AppVersion}}
+      
+      - name: Update index.yaml
+        run: helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
+
+
+      ### ****** This part stores packages in gh-pages branch ( compares versions in this branch)
       # - name: Run chart-releaser
       #   uses: helm/chart-releaser-action@v1.2.1
       #   with:
@@ -38,3 +54,5 @@ jobs:
       #     charts_repo_url: http://opensource.appbase.io/helm-charts/
       #   env:
       #     CR_TOKEN: "${{ secrets.RELEASER }}"
+      
+      # *************************************************************************

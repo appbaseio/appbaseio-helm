@@ -40,13 +40,19 @@ jobs:
           echo "App Version is " ${{steps.appV.outputs.AppVersion}}
           echo "Chart Version is " ${{steps.chartID.outputs.chartVersion}}
 
-
-
       - name: Packaging
         run: helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}}
       
       - name: Update index.yaml
-        run: helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
+        run: |
+          rm ./index.yaml && touch  ./appbaseio/index.yaml
+          helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
+          mv ./appbaseio/index.yaml ./
+
+
+  UpdateGit:
+    runs-on: ['self-hosted', 'helm-chart']
+    steps:
 
       - name: Git set remote URL
         run: git remote set-url origin https://${{ secrets.RELEASER }}@github.com/appbaseio/helm-charts.git

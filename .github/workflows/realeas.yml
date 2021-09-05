@@ -51,6 +51,11 @@ jobs:
       - name: Git set remote URL
         run: git remote set-url origin https://${{ secrets.RELEASER }}@github.com/appbaseio/helm-charts.git
 
+      - name: Configure Git
+        run: |
+          git config user.name "${{secrets.USER_NAME}}"
+          git config user.email "${{secrets.USER_EMAIL}}"
+
       - name: Commit the changes
         run: git commit -m "v${{steps.appV.outputs.AppVersion}}"
 

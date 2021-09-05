@@ -54,7 +54,7 @@ jobs:
           mv ./"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./appbaseio
 
       - name: Remove index.yaml if exists
-        if: steps.indexYaml.outputs.indexYaml=="index.yaml"  
+        if: steps.indexYaml.outputs.indexYaml != ""  
         run: rm ./index.yaml
       
       - name: Update index.yaml

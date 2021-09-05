@@ -33,23 +33,29 @@ jobs:
       - name: Extracting AppVersion
         run: |
           echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
-          echo $(pwd)
         id: appV
 
       - name: Show AppVersion
         run: | 
-          echo $(pwd)
           echo "App Version is " ${{steps.appV.outputs.AppVersion}}
-          echo "Chart Version is " ${{steps.appV.outputs.chartVersion}}
+          echo "Chart Version is " ${{steps.chartID.outputs.chartVersion}}
 
 
 
       - name: Packaging
-        run: helm package ./appbaseio --app-version ${{steps.appV.output.AppVersion}}
+        run: helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}}
       
       - name: Update index.yaml
         run: helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
 
+      - name: Git set remote URL
+        run: git remote set-url origin https://${{ secrets.RELEASER }}@github.com/appbaseio/helm-charts.git
+
+      - name: Commit the changes
+        run: git commit -m "v${{steps.appV.outputs.AppVersion}}"
+
+      - name: Push changes into main
+        run: git push origin feat/cicd
 
       ### ****** This part stores packages in gh-pages branch ( compares versions in this branch)
       # - name: Run chart-releaser

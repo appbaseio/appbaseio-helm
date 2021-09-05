@@ -9,6 +9,9 @@ on:
 jobs:
   release:
     runs-on: ['self-hosted', 'helm-chart']
+    outputs:
+      # Set Between jobs Variable ;)
+      job_AppVersion: ${{steps.appV.outputs.AppVersion}}
     steps:
     
       - name: Checkout
@@ -63,6 +66,9 @@ jobs:
         run: mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
 
 
+
+
+
   UpdateGit:
     needs: release
     runs-on: ['self-hosted', 'helm-chart']
@@ -79,7 +85,7 @@ jobs:
       - name: Commit the changes
         run: |
           git add .
-          git commit -m "v${{needs.release.steps.appV.outputs.AppVersion}}"
+          git commit -m "v${{needs.release.outputs.job_AppVersion}}"
 
       - name: Push changes into main
         run: git push origin feat/cicd

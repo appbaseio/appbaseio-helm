@@ -51,6 +51,7 @@ jobs:
 
 
   UpdateGit:
+    needs: release
     runs-on: ['self-hosted', 'helm-chart']
     steps:
 

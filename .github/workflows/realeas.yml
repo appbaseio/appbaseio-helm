@@ -44,10 +44,7 @@ jobs:
         run: helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}}
       
       - name: Update index.yaml
-        run: |
-          rm ./index.yaml && touch  ./appbaseio/index.yaml
-          helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
-          mv ./appbaseio/index.yaml ./
+        run: rm ./index.yaml && helm repo index ./ --url http://opensource.appbase.io/helm-charts/
 
 
   UpdateGit:

@@ -15,11 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Configure Git
-      #   run: |
-      #     git config user.name "$GITHUB_ACTOR"
-      #     git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
       - name: Install Helm
         uses: azure/setup-helm@v1
         with:
@@ -39,6 +34,13 @@ jobs:
         run: echo ::set-output name=AppVersion::$(grep -A3 appVersion ./appbaseio/Chart.yaml | awk '{print $2}')   
         id: appV
 
+      - name: Show AppVersion
+        run: | 
+        echo "App Version is " {{steps.appV.output.AppVersion}}
+        echo "Chart Version is " {{steps.appV.output.chartVersion}}
+
+
+
       - name: Packaging
         run: helm package ./appbaseio --app-version ${{steps.appV.output.AppVersion}}
       
@@ -54,5 +56,5 @@ jobs:
       #     charts_repo_url: http://opensource.appbase.io/helm-charts/
       #   env:
       #     CR_TOKEN: "${{ secrets.RELEASER }}"
-      
+
       # *************************************************************************

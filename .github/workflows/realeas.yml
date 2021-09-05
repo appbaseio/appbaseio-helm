@@ -72,7 +72,7 @@ jobs:
       - name: Commit the changes
         run: |
           git add .
-          git commit -m "v${{jobs.release.steps.appV.outputs.AppVersion}}"
+          git commit -m "v${{needs.release.steps.appV.outputs.AppVersion}}"
 
       - name: Push changes into main
         run: git push origin feat/cicd

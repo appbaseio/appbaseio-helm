@@ -63,7 +63,9 @@ jobs:
           helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
       
       - name: Move Package
-        run: mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
+        run: | 
+          mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
+          mv ./appbaseio/index.yaml ./
 
 
 

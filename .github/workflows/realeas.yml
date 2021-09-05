@@ -36,6 +36,10 @@ jobs:
           echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
         id: appV
 
+      - name: Extract index.yaml  
+        run: echo ::set-output name=indexYaml::$(ls ./ | grep "index.yaml")
+        id: indexYaml
+
       - name: Show AppVersion
         run: | 
           echo "App Version is " ${{steps.appV.outputs.AppVersion}}
@@ -45,10 +49,13 @@ jobs:
         run: | 
           helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}} 
           mv ./"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./appbaseio
+
+      - name: Remove index.yaml if exists
+        if: steps.indexYaml.outputs.indexYaml=="index.yaml"  
+        run: rm ./index.yaml
       
       - name: Update index.yaml
         run: |
-          rm ./index.yaml
           touch ./appbaseio/index.yaml
           helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
       

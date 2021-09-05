@@ -41,10 +41,18 @@ jobs:
           echo "Chart Version is " ${{steps.chartID.outputs.chartVersion}}
 
       - name: Packaging
-        run: helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}}
+        run: | 
+          helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}} 
+          mv ./"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./appbaseio
       
       - name: Update index.yaml
-        run: rm ./index.yaml && helm repo index ./ --url http://opensource.appbase.io/helm-charts/
+        run: |
+          rm ./index.yaml
+          touch ./appbaseio/index.yaml
+          helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
+      
+      - name: Move Package
+        run: mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
 
 
   UpdateGit:
@@ -63,7 +71,7 @@ jobs:
       - name: Commit the changes
         run: |
           git add .
-          git commit -m "v${{steps.appV.outputs.AppVersion}}"
+          git commit -m "v${{release.steps.appV.outputs.AppVersion}}"
 
       - name: Push changes into main
         run: git push origin feat/cicd

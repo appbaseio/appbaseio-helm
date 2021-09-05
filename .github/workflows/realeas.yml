@@ -36,8 +36,8 @@ jobs:
 
       - name: Show AppVersion
         run: | 
-          echo "App Version is " {{steps.appV.output.AppVersion}}
-          echo "Chart Version is " {{steps.appV.output.chartVersion}}
+          echo "App Version is " ${{steps.appV.output.AppVersion}}
+          echo "Chart Version is " ${{steps.appV.output.chartVersion}}
 
 
 

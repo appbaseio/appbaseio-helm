@@ -27,15 +27,18 @@ jobs:
         run: helm version   
 
       - name: Extract chartVersion
-        run: echo ::set-output name=chartVersion::grep 'version:' ./appbaseio/Chart.yaml | awk '{print $2}'
+        run: echo ::set-output name=chartVersion::$(grep 'version:' ./appbaseio/Chart.yaml | awk '{print $2}')
         id: chartID
 
       - name: Extracting AppVersion
-        run: echo ::set-output name=AppVersion::$(grep -A3 appVersion ./appbaseio/Chart.yaml | awk '{print $2}')   
+        run: |
+          echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
+          echo $(pwd)
         id: appV
 
       - name: Show AppVersion
         run: | 
+          echo $(pwd)
           echo "App Version is " ${{steps.appV.output.AppVersion}}
           echo "Chart Version is " ${{steps.appV.output.chartVersion}}
 

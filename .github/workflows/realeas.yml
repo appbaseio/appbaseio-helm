@@ -4,7 +4,7 @@ name: Helm Chart Releaser
 on:
   push:
     branches:
-      - feat/cicd
+      - main
 
 jobs:
   release:

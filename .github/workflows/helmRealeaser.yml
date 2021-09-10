@@ -11,7 +11,7 @@ jobs:
     runs-on: ['self-hosted', 'helm-chart']
     outputs:
       ## Set Between jobs Variable ;)
-      job_AppVersion: ${{ github.event.release.tag_name }}"
+      job_AppVersion: ${{ github.event.release.tag_name }}
     steps:
     
       - name: Checkout

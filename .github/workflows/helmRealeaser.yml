@@ -2,16 +2,16 @@
 name: Helm Chart Releaser
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
+
 
 jobs:
   release:
     runs-on: ['self-hosted', 'helm-chart']
     outputs:
-      # Set Between jobs Variable ;)
-      job_AppVersion: ${{steps.appV.outputs.AppVersion}}
+      ## Set Between jobs Variable ;)
+      job_AppVersion: ${{ github.event.release.tag_name }}"
     steps:
     
       - name: Checkout
@@ -34,10 +34,10 @@ jobs:
         run: echo ::set-output name=chartVersion::$(grep 'version:' ./appbaseio/Chart.yaml | awk '{print $2}')
         id: chartID
 
-      - name: Extracting AppVersion
-        run: |
-          echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
-        id: appV
+      # - name: Extracting AppVersion
+      #   run: |
+      #     echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
+      #   id: appV
 
       - name: Extract index.yaml  
         run: echo ::set-output name=indexYaml::$(ls ./ | grep "index.yaml")
@@ -45,12 +45,11 @@ jobs:
 
       - name: Show AppVersion
         run: | 
-          echo "App Version is " ${{steps.appV.outputs.AppVersion}}
-          echo "Chart Version is " ${{steps.chartID.outputs.chartVersion}}
+          echo "Tag Version is ${{ github.event.release.tag_name }}"
 
       - name: Packaging
         run: | 
-          helm package ./appbaseio --app-version ${{steps.appV.outputs.AppVersion}} 
+          helm package ./appbaseio --app-version ${{ github.event.release.tag_name }}
           mv ./"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./appbaseio
 
       - name: Remove index.yaml if exists

@@ -13,14 +13,16 @@ jobs:
       ## Set Between jobs Variable ;)
       job_AppVersion: ${{ github.event.release.tag_name }}
     steps:
-    
-      - name: Checkout
+      - name: show branch
+        run: echo ${{ steps.extract_branch.outputs.branch }}
+
+      - name : clone Repo 
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
-
-      - name: Pull changes
-        run: git pull origin feat/cicd
+          repository: appbaseio/helm-charts 
+          token: ${{ secrets.RELEASER }}
+          ref: ${{ steps.extract_branch.outputs.branch }}
+          
 
       - name: Install Helm
         uses: azure/setup-helm@v1

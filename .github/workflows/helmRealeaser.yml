@@ -1,0 +1,105 @@
+# should have "zip" - "git" - "github runner" to be available on server ( in self-hosted mode )
+name: Helm Chart Releaser
+
+on:
+  release:
+    types: [published]
+
+
+jobs:
+  release:
+    runs-on: ['self-hosted', 'helm-chart']
+    outputs:
+      ## Set Between jobs Variable ;)
+      job_AppVersion: ${{ github.event.release.tag_name }}
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: main
+
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: test location
+        run: echo $(pwd)   
+
+      - name: check helm
+        run: helm version   
+
+      - name: Extract chartVersion
+        run: echo ::set-output name=chartVersion::$(grep 'version:' ./appbaseio/Chart.yaml | awk '{print $2}')
+        id: chartID
+
+      # - name: Extracting AppVersion
+      #   run: |
+      #     echo ::set-output name=AppVersion::$(grep -A3 'appVersion:' ./appbaseio/Chart.yaml | awk '{print $2}')   
+      #   id: appV
+
+      - name: Extract index.yaml  
+        run: echo ::set-output name=indexYaml::$(ls ./ | grep "index.yaml")
+        id: indexYaml
+
+      - name: Show AppVersion
+        run: | 
+          echo "Tag Version is ${{ github.event.release.tag_name }}"
+
+      - name: Packaging
+        run: | 
+          helm package ./appbaseio --app-version ${{ github.event.release.tag_name }}
+          mv ./"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./appbaseio
+
+      - name: Remove index.yaml if exists
+        if: steps.indexYaml.outputs.indexYaml == 'index.yaml'  
+        run: rm ./index.yaml
+      
+      - name: Update index.yaml
+        run: |
+          touch ./appbaseio/index.yaml
+          helm repo index appbaseio/ --url http://opensource.appbase.io/helm-charts/
+      
+      - name: Move Package
+        run: | 
+          mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
+          mv ./appbaseio/index.yaml ./
+
+
+
+
+
+  UpdateGit:
+    needs: release
+    runs-on: ['self-hosted', 'helm-chart']
+    steps:
+
+      - name: Git set remote URL
+        run: git remote set-url origin https://${{ secrets.RELEASER }}@github.com/appbaseio/helm-charts.git
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{secrets.USER_NAME}}"
+          git config user.email "${{secrets.USER_EMAIL}}"
+
+      - name: Commit the changes
+        run: |
+          git add .
+          git commit -m "v${{needs.release.outputs.job_AppVersion}}"
+
+      - name: Push changes into main
+        run: git push origin main
+
+      ### ****** This part stores packages in gh-pages branch ( compares versions in this branch)
+      # - name: Run chart-releaser
+      #   uses: helm/chart-releaser-action@v1.2.1
+      #   with:
+      #     charts_dir: charts
+      #     charts_repo_url: http://opensource.appbase.io/helm-charts/
+      #   env:
+      #     CR_TOKEN: "${{ secrets.RELEASER }}"
+
+      # *************************************************************************

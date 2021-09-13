@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: feat/cicd
+          ref: main
 
 
       - name: Install Helm
@@ -91,7 +91,7 @@ jobs:
           git commit -m "v${{needs.release.outputs.job_AppVersion}}"
 
       - name: Push changes into main
-        run: git push origin feat/cicd
+        run: git push origin main
 
       ### ****** This part stores packages in gh-pages branch ( compares versions in this branch)
       # - name: Run chart-releaser

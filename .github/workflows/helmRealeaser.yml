@@ -68,15 +68,6 @@ jobs:
           mv ./appbaseio/"appbaseio-${{steps.chartID.outputs.chartVersion}}.tgz" ./
           mv ./appbaseio/index.yaml ./
 
-
-
-
-
-  UpdateGit:
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-
       - name: Git set remote URL
         run: git remote set-url origin https://${{ secrets.RELEASER }}@github.com/appbaseio/helm-charts.git
 

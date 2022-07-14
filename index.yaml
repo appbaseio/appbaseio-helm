@@ -2,13 +2,13 @@ apiVersion: v1
 entries:
   appbaseio:
   - apiVersion: v2
-    appVersion: 8.3.0
-    created: "2022-06-20T12:08:42.433193496Z"
+    appVersion: 8.4.0
+    created: "2022-07-14T23:03:34.245240495Z"
     description: appbase.io API gateway for an upstream Elasticsearch cluster
-    digest: a1a1c10a4d710cacef379af570382c1f307c9e95179b9c92430d158d0c7d3289
+    digest: d789452ae319b00898aa38b7c81fc77cea5c4f32e8ce2262612176006824e019
     name: appbaseio
     type: application
     urls:
     - http://opensource.appbase.io/helm-charts/appbaseio-0.1.3.tgz
     version: 0.1.3
-generated: "2022-06-20T12:08:42.432538605Z"
+generated: "2022-07-14T23:03:34.244600802Z"
